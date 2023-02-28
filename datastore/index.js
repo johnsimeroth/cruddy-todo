@@ -25,37 +25,41 @@ exports.create = (text, callback) => {
 };
 
 exports.readAll = (callback) => {
-  var someCallback = (err, files) => {
+  var formatFileData = (err, files) => {
     var data = files.map(id => {
       id = id.slice(0, -4);
       return {id: id, text: id};
     });
-    console.log('formatted file data object: ', data);
+    // console.log('formatted file data object: ', data);
     callback(null, data);
     // that look like this: { id, id }
     // at the end, call callback(err, files);
   };
-  // use readdir with pathname and someCallback(err, files)
-  fs.readdir(exports.dataDir, someCallback);
-  // someCallback needs to reformat the files array to be an array of objects
-
-
-
-
-
-  // var data = _.map(items, (text, id) => {
-  //   return { id, text };
-  // });
-  // callback(null, data);
+  // use readdir with pathname and formatFileData(err, files)
+  fs.readdir(exports.dataDir, (err, files) => {
+    if (err) {
+      throw ('error reading directory in index.js readAll');
+    } else {
+      formatFileData(null, files);
+    }
+  });
 };
 
 exports.readOne = (id, callback) => {
-  var text = items[id];
-  if (!text) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback(null, { id, text });
-  }
+  // var text = items[id];
+  // if (!text) {
+  //   callback(new Error(`No item with id: ${id}`));
+  // } else {
+  //   callback(null, { id, text });
+  // }
+  let pathname = path.join(exports.dataDir, `${id}.txt`);
+  fs.readFile(pathname, 'utf8', (err, text) => {
+    if (err) {
+      callback(new Error(`No item with id: ${id}`));
+    } else {
+      callback(null, { id, text });
+    }
+  });
 };
 
 exports.update = (id, text, callback) => {
