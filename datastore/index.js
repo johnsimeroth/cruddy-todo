@@ -3,15 +3,13 @@ const path = require('path');
 const _ = require('underscore');
 const counter = require('./counter');
 
-// var items = {};
+const filepath = (id) => (path.join(exports.dataDir, `${id}.txt`));
 
 // Public API - Fix these CRUD functions ////////////////////////////////////////
 
 exports.create = (text, callback) => {
   var updateItems = (err, id) => {
-    // items[id] = text;
-    let pathname = path.join(exports.dataDir, `${id}.txt`);
-    fs.writeFile( pathname, text, (err) => {
+    fs.writeFile( filepath(id), text, (err) => {
       if (err) {
         throw ('error writing todo file');
       } else {
@@ -30,12 +28,8 @@ exports.readAll = (callback) => {
       id = id.slice(0, -4);
       return {id: id, text: id};
     });
-    // console.log('formatted file data object: ', data);
     callback(null, data);
-    // that look like this: { id, id }
-    // at the end, call callback(err, files);
   };
-  // use readdir with pathname and formatFileData(err, files)
   fs.readdir(exports.dataDir, (err, files) => {
     if (err) {
       throw ('error reading directory in index.js readAll');
@@ -46,8 +40,7 @@ exports.readAll = (callback) => {
 };
 
 exports.readOne = (id, callback) => {
-  let pathname = path.join(exports.dataDir, `${id}.txt`);
-  fs.readFile(pathname, 'utf8', (err, text) => {
+  fs.readFile(filepath(id), 'utf8', (err, text) => {
     if (err) {
       callback(new Error(`No item with id: ${id}`));
     } else {
@@ -57,20 +50,11 @@ exports.readOne = (id, callback) => {
 };
 
 exports.update = (id, text, callback) => {
-  // var item = items[id];
-  // if (!item) {
-  //   callback(new Error(`No item with id: ${id}`));
-  // } else {
-  //   items[id] = text;
-  //   callback(null, { id, text });
-  // }
-  let pathname = path.join(exports.dataDir, `${id}.txt`);
-
-  fs.access(pathname, (err) => {
+  fs.access(filepath(id), (err) => {
     if (err) {
       callback(new Error('Todo file does not exist'));
     } else {
-      fs.writeFile( pathname, text, (err) => {
+      fs.writeFile( filepath(id), text, (err) => {
         if (err) {
           callback(new Error('error updating todo file'));
         } else {
@@ -79,18 +63,16 @@ exports.update = (id, text, callback) => {
       });
     }
   });
-
 };
 
 exports.delete = (id, callback) => {
-  var item = items[id];
-  delete items[id];
-  if (!item) {
-    // report an error if item not found
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback();
-  }
+  fs.unlink(filepath(id), (err) => {
+    if (err) {
+      callback(new Error('No file to delete'));
+    } else {
+      callback();
+    }
+  });
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
