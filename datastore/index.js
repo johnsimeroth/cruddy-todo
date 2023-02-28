@@ -3,13 +3,13 @@ const path = require('path');
 const _ = require('underscore');
 const counter = require('./counter');
 
-var items = {};
+// var items = {};
 
 // Public API - Fix these CRUD functions ////////////////////////////////////////
 
 exports.create = (text, callback) => {
   var updateItems = (err, id) => {
-    items[id] = text;
+    // items[id] = text;
     let pathname = path.join(exports.dataDir, `${id}.txt`);
     fs.writeFile( pathname, text, (err) => {
       if (err) {
@@ -46,12 +46,6 @@ exports.readAll = (callback) => {
 };
 
 exports.readOne = (id, callback) => {
-  // var text = items[id];
-  // if (!text) {
-  //   callback(new Error(`No item with id: ${id}`));
-  // } else {
-  //   callback(null, { id, text });
-  // }
   let pathname = path.join(exports.dataDir, `${id}.txt`);
   fs.readFile(pathname, 'utf8', (err, text) => {
     if (err) {
@@ -63,13 +57,29 @@ exports.readOne = (id, callback) => {
 };
 
 exports.update = (id, text, callback) => {
-  var item = items[id];
-  if (!item) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    items[id] = text;
-    callback(null, { id, text });
-  }
+  // var item = items[id];
+  // if (!item) {
+  //   callback(new Error(`No item with id: ${id}`));
+  // } else {
+  //   items[id] = text;
+  //   callback(null, { id, text });
+  // }
+  let pathname = path.join(exports.dataDir, `${id}.txt`);
+
+  fs.access(pathname, (err) => {
+    if (err) {
+      callback(new Error('Todo file does not exist'));
+    } else {
+      fs.writeFile( pathname, text, (err) => {
+        if (err) {
+          callback(new Error('error updating todo file'));
+        } else {
+          callback(null, { id, text });
+        }
+      });
+    }
+  });
+
 };
 
 exports.delete = (id, callback) => {
