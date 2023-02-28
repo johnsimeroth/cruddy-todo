@@ -3,7 +3,7 @@
 
 const Todo = require('./datastore');
 
-// Configure Express ///////////////////////////////////////////////////////////
+// Configure Express ////////////////////////////////////////////////////////////
 
 const express = require('express');
 const morgan = require('morgan');
@@ -40,6 +40,8 @@ app.get('/todo', (req, res) => {
 });
 
 // Read one (cRud) -- member route
+// JS: how does it know to use this get over the other one? Does it actually look at the format of the input arg?
+// is this an express thing?
 app.get('/todo/:id', (req, res) => {
   Todo.readOne(req.params.id, (err, todo) => {
     if (todo) {
