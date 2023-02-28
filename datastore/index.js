@@ -8,16 +8,45 @@ var items = {};
 // Public API - Fix these CRUD functions ////////////////////////////////////////
 
 exports.create = (text, callback) => {
-  var id = counter.getNextUniqueId();
-  items[id] = text;
-  callback(null, { id, text });
+  var updateItems = (err, id) => {
+    items[id] = text;
+    let pathname = path.join(exports.dataDir, `${id}.txt`);
+    fs.writeFile( pathname, text, (err) => {
+      if (err) {
+        throw ('error writing todo file');
+      } else {
+        callback(null, { id, text });
+      }
+    });
+  };
+
+  counter.getNextUniqueId(updateItems);
+
 };
 
 exports.readAll = (callback) => {
-  var data = _.map(items, (text, id) => {
-    return { id, text };
-  });
-  callback(null, data);
+  var someCallback = (err, files) => {
+    var data = files.map(id => {
+      id = id.slice(0, -4);
+      return {id: id, text: id};
+    });
+    console.log('formatted file data object: ', data);
+    callback(null, data);
+    // that look like this: { id, id }
+    // at the end, call callback(err, files);
+  };
+  // use readdir with pathname and someCallback(err, files)
+  fs.readdir(exports.dataDir, someCallback);
+  // someCallback needs to reformat the files array to be an array of objects
+
+
+
+
+
+  // var data = _.map(items, (text, id) => {
+  //   return { id, text };
+  // });
+  // callback(null, data);
 };
 
 exports.readOne = (id, callback) => {

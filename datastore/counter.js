@@ -40,7 +40,7 @@ const writeCounter = (count, callback) => {
 
 exports.getNextUniqueId = (callback) => {
   // use readCounter to re-assign counter to the current value
-  const updateCounter = (whatever, data) => {
+  const updateCounter = (err, data) => {
     // add 1, convert back to padded string
     counter = data + 1;
     // write new ID to file using writeCounter
@@ -55,3 +55,4 @@ exports.getNextUniqueId = (callback) => {
 // Configuration -- DO NOT MODIFY //////////////////////////////////////////////
 
 exports.counterFile = path.join(__dirname, 'counter.txt');
+// exports.counterFile = './datastore/counter.txt';
